@@ -1,0 +1,128 @@
+
+import java.util.*;
+class Solution  {
+	public static void main(String args[] ) throws Exception {
+        Scanner sc = new Scanner(System.in);
+        HashMap airport = new HashMap();
+        ArrayList al = new ArrayList();
+        
+        //Adding three airport 
+        Airport mumbai = new Airport("Mumbai");  
+        Airport delhi = new Airport("Delhi");
+        Airport kerala = new Airport("kerala");
+        
+        // Adding their corresponding plane with there destination and time required to reach
+        mumbai.add(new Plane(2,"Delhi"));
+        mumbai.add(new Plane(1,"Kerala"));
+        mumbai.add(new Plane(1,"Kerala"));
+        mumbai.add(new Plane(2,"Delhi"));
+        
+        delhi.add(new Plane(2,"Mumbai"));
+        delhi.add(new Plane(2,"Mumbai"));
+        delhi.add(new Plane(4,"Kerala"));
+        
+        kerala.add(new Plane(4,"Delhi"));
+        kerala.add(new Plane(4,"Delhi"));
+        
+        airport.put("Mumbai",mumbai); 
+        airport.put("Delhi",delhi);
+        airport.put("Kerala",kerala);
+        al.add(mumbai);
+        al.add(delhi);
+        al.add(kerala);
+        
+        //Calculating the Schedule
+        int num = 4;
+        int n = 3;
+        int i=0,j=0;
+        
+        while(num-->0) {
+        	i=0;
+        	n=3;
+        	while(n-->0) {
+        		Airport departure = (Airport)al.get(i);
+        		Plane p=null;
+        		try {
+        			p = (Plane)departure.plane.get(j);
+        		}
+        		catch(Exception e) {
+        			continue;
+        		}
+        		double destnTime = p.destnHours;
+        		String destnName = p.destnName;
+        		Airport destnAirport = (Airport)airport.get(destnName);
+        		ArrayList destnSch = (ArrayList)destnAirport.schedule;
+        		double d = departure.lastFlightTime+0.5;
+        		if(departure.schedule.contains(d)) {
+        			while(destnAirport.schedule.contains(d)) {
+        				d+=0.5;
+        			}
+        		}
+        		if(destnAirport.schedule.contains(d+destnTime)) {
+        			while(destnAirport.schedule.contains(d+destnTime)) {
+        				d+=0.5;
+        			}
+        			destnAirport.schedule.add(d+destnTime);
+        			departure.schedule.add(d);
+        			departure.takeoff.add("To "+destnName+" at "+time(d));
+        			destnAirport.landing.add("From "+departure.airportName+" at "+time(d+destnTime));
+        			departure.lastFlightTime=d;
+        		}
+        		else {
+        			destnAirport.schedule.add(d+destnTime);
+        			departure.schedule.add(d);
+        			departure.takeoff.add("To "+destnName+" at "+time(d));
+        			destnAirport.landing.add("From "+departure.airportName+" at "+time(d+destnTime));
+        			departure.lastFlightTime=d;
+        		}
+        		i++;
+        	}
+        	j++;
+        }
+        System.out.println("Time has been considered from 00:00am");
+        for(int l=0;l<airport.size();l++) {
+        	Airport a = (Airport)al.get(l);
+        	System.out.println(a.airportName);
+        	System.out.println("\nPlane Takeoff Time From Mumbai");
+        	for(int k=0;k<a.takeoff.size();k++) {
+        		System.out.println(a.takeoff.get(k));
+        	}
+        	System.out.println("\nPlane landing Time to Mumbai");
+        	for(int k=0;k<a.landing.size();k++) {
+        		System.out.println(a.landing.get(k));
+        	}
+        	System.out.println("=====================");
+        }
+	}
+	public static String time(double d) {
+		int num = (int)d;
+		if(num<d)
+			return "0"+num+":"+"30";
+		else
+			return "0"+num+":"+"00";
+	}
+}
+class Airport<Plane>{
+	String airportName;						//Name of Airport
+	double  lastFlightTime=-0.5;						//Time of last flight which takeoff or landed
+	ArrayList plane = new ArrayList();			//List of Plane that will takeoff
+	ArrayList schedule = new ArrayList();		//Time of takeoff	
+	ArrayList takeoff = new ArrayList();
+	ArrayList landing = new ArrayList();
+	Airport(String name){
+		this.airportName=name;
+	}
+	
+	public void add(Plane plane) {			
+		this.plane.add(plane);
+	}
+}
+class Plane{
+	double destnHours;							//Time Required to destination
+	String destnName;						//Name of Destination
+	
+	Plane(int num,String name){
+		this.destnHours=num;
+		this.destnName=name;
+	}
+}
